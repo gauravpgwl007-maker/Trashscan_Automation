@@ -20,7 +20,7 @@ stages {
 
     stage('Checkout Code') {
         steps {
-            git branch: 'main', 'https://https://github.com/gauravpgwl007-maker/Trashscan_Automation.git'
+            git branch: 'main', url: 'https://github.com/gauravpgwl007-maker/Trashscan_Automation.git'
         }
     }
 
