@@ -1,7 +1,7 @@
 pipeline {
 agent any
 
-```
+
 tools {
     nodejs 'NodeJS'
 }
@@ -20,7 +20,7 @@ stages {
 
     stage('Checkout Code') {
         steps {
-            git 'https://https://github.com/gauravpgwl007-maker/Trashscan_Automation.git'
+            git branch: 'main', 'https://https://github.com/gauravpgwl007-maker/Trashscan_Automation.git'
         }
     }
 
@@ -79,6 +79,6 @@ post {
         """
     }
 }
-```
+
 
 }
