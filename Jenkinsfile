@@ -13,7 +13,7 @@ triggers {
 environment {
     ANDROID_HOME = "C:\\Users\\gwl\\AppData\\Local\\Android\\Sdk"
     PATH = "${ANDROID_HOME}\\platform-tools;${ANDROID_HOME}\\emulator;${env.PATH}"
-    AVD_NAME = "Pixel_9_Pro_XL_API_36.1"
+    AVD_NAME = "Pixel_9_Pro_XL"
 }
 
 stages {
@@ -33,7 +33,7 @@ stages {
     stage('Start Emulator') {
         steps {
             bat """
-            start "" "%ANDROID_HOME%\\emulator\\emulator.exe" -avd %AVD_NAME% -no-snapshot -no-audio -no-boot-anim
+            start "" "%ANDROID_HOME%\\emulator\\emulator.exe" -avd Pixel_9_Pro_XL -no-window -no-audio -no-boot-anim
             """
         }
     }
