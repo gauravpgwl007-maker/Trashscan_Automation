@@ -79,6 +79,24 @@ exports.config = {
   // =====
   // Hooks
   // =====
+  before: async () => {
+    try {
+        await driver.execute('mobile: shell', {
+            command: 'pm grant',
+            args: ['com.gwl.trashscan', 'android.permission.CAMERA']
+        });
+        console.log('📸 Camera permission granted globally');
+    } catch (e) {}
+    await driver.execute('mobile: shell', {
+    command: 'pm grant',
+    args: ['com.gwl.trashscan', 'android.permission.READ_MEDIA_IMAGES']
+});
+
+await driver.execute('mobile: shell', {
+    command: 'pm grant',
+    args: ['com.gwl.trashscan', 'android.permission.READ_MEDIA_VIDEO']
+});
+},
   beforeSuite: function (suite) {
     console.log(`🚀 Starting suite: ${suite.title}`);
   },
@@ -86,6 +104,16 @@ exports.config = {
   afterSuite: function (suite) {
     console.log(`✅ Finished suite: ${suite.title}`);
   },
+  
+afterTest: async function (test, context, { error }) {
+
+        const timestamp = new Date().getTime();
+        const fileName = `./screenshots/${test.title.replace(/ /g, '_')}_${timestamp}.png`;
+
+        await driver.saveScreenshot(fileName);
+        console.log(`📸 Screenshot saved: ${fileName}`);
+    },
+
 
   /**
    * onComplete: generate Allure report synchronously so errors are visible in WDIO logs,

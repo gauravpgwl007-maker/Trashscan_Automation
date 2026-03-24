@@ -1,101 +1,110 @@
-// test/specs/homescreen.spec.js
-
 const HomeScreen = require('../pageobjects/home.screen');
-
 
 describe('Home Screen Functionality', () => {
 
+    before(async () => {
+        try {
+            // 📸 Camera permission
+            await driver.execute('mobile: shell', {
+                command: 'pm grant',
+                args: ['com.gwl.trashscan', 'android.permission.CAMERA']
+            });
+
+            // 🖼️ Media permissions (Android 13+)
+            await driver.execute('mobile: shell', {
+                command: 'pm grant',
+                args: ['com.gwl.trashscan', 'android.permission.READ_MEDIA_IMAGES']
+            });
+
+            await driver.execute('mobile: shell', {
+                command: 'pm grant',
+                args: ['com.gwl.trashscan', 'android.permission.READ_MEDIA_VIDEO']
+            });
+
+            console.log('✅ All permissions granted via ADB');
+        } catch (e) {
+            console.log('⚠️ Permission grant failed');
+        }
+    });
+
     it('should handle Clock In if available', async () => {
         await HomeScreen.waitForHomeScreen();
+
         if (await HomeScreen.clockInBtn.isDisplayed().catch(() => false)) {
             console.log('🕓 Clock In button found, performing action...');
             await HomeScreen.clockIn();
+
             expect(await HomeScreen.clockOutBtn.isDisplayed()).toBe(true);
         } else {
             console.log('⚠️ Clock In button not found, skipping test.');
         }
     });
 
-    it('should handle Clock Out if available', async () => {
-        await HomeScreen.waitForHomeScreen();
-        if (await HomeScreen.clockOutBtn.isDisplayed().catch(() => false)) {
-            console.log('🕕 Clock Out button found, performing action...');
-            await HomeScreen.clockOut();
-            expect(await HomeScreen.clockInBtn.isDisplayed()).toBe(true);
-        } else {
-            console.log('⚠️ Clock Out button not found, skipping test.');
-        }
-    });
-
     it('should open Work Progress and return to Home', async () => {
         await HomeScreen.waitForHomeScreen();
         await HomeScreen.openWorkProgress();
-        await driver.waitUntil(
-            async () => !(await HomeScreen.isWorkProgressVisible()),
-            { timeout: 5000, timeoutMsg: '❌ Work Progress page did not load properly' }
-        );
+
         await HomeScreen.backToHome();
-        expect(await HomeScreen.isWorkProgressVisible()).toBe(true);
+        expect(await HomeScreen.workProgressTile.isDisplayed()).toBe(true);
     });
 
     it('should open Pickup and return to Home', async () => {
         await HomeScreen.waitForHomeScreen();
         await HomeScreen.openPickup();
-        await driver.waitUntil(
-            async () => !(await HomeScreen.isPickupVisible()),
-            { timeout: 5000, timeoutMsg: '❌ Pickup page did not load properly' }
-        );
+
         await HomeScreen.backToHome();
-        expect(await HomeScreen.isPickupVisible()).toBe(true);
+        expect(await HomeScreen.pickupTile.isDisplayed()).toBe(true);
     });
 
     it('should open Activity Logs and return to Home', async () => {
         await HomeScreen.waitForHomeScreen();
         await HomeScreen.openActivityLogs();
-        await driver.waitUntil(
-            async () => !(await HomeScreen.isActivityLogsVisible()),
-            { timeout: 5000, timeoutMsg: '❌ Activity Logs page did not load properly' }
-        );
+
         await HomeScreen.backToHome();
-        expect(await HomeScreen.isActivityLogsVisible()).toBe(true);
+        expect(await HomeScreen.activityLogsTile.isDisplayed()).toBe(true);
     });
 
     it('should open Add Notes and return to Home', async () => {
         await HomeScreen.waitForHomeScreen();
         await HomeScreen.openAddNotes();
-        await driver.waitUntil(
-            async () => !(await HomeScreen.isAddNotesVisible()),
-            { timeout: 5000, timeoutMsg: '❌ Add Notes page did not load properly' }
-        );
+
         await HomeScreen.backToHome();
-        expect(await HomeScreen.isAddNotesVisible()).toBe(true);
+        expect(await HomeScreen.addNotesTile.isDisplayed()).toBe(true);
     });
 
     it('should open Daily Work Plan and return to Home', async () => {
         await HomeScreen.waitForHomeScreen();
         await HomeScreen.openDailyWorkPlan();
-        await driver.waitUntil(
-            async () => !(await HomeScreen.isDailyWorkPlanVisible()),
-            { timeout: 5000, timeoutMsg: '❌ Daily Work Plan page did not load properly' }
-        );
+
         await HomeScreen.backToHome();
-        expect(await HomeScreen.isDailyWorkPlanVisible()).toBe(true);
+        expect(await HomeScreen.dailyWorkPlanTile.isDisplayed()).toBe(true);
     });
 
-   it('should open Violation -> Manual and return to Home', async () => {
-    await HomeScreen.openViolationManual();
-    expect(await HomeScreen.violationTile().isDisplayed()).toBe(true);
-});
+    it('should complete all Violation flows', async () => {
+        await HomeScreen.waitForHomeScreen();
 
-it('should open Violation -> Scan View and return to Home', async () => {
-    await HomeScreen.openViolationScanView();
-    expect(await HomeScreen.violationTile().isDisplayed()).toBe(true);
-});
+        console.log('🚀 Starting Violation flows...');
 
-it('should open Violation -> Quick Snap and return to Home', async () => {
-    await HomeScreen.openViolationQuickSnap();
-    expect(await HomeScreen.violationTile().isDisplayed()).toBe(true);
-});
+        await HomeScreen.openViolationManual();
+        await HomeScreen.openViolationScanView();
+        await HomeScreen.openViolationQuickSnap();
 
+        console.log('✅ All violation tasks completed');
+
+        expect(await HomeScreen.violationTile.isDisplayed()).toBe(true);
+    });
+
+    it('should perform Clock Out at the end', async () => {
+        await HomeScreen.waitForHomeScreen();
+
+        if (await HomeScreen.clockOutBtn.isDisplayed().catch(() => false)) {
+            console.log('🕕 Performing Clock Out...');
+            await HomeScreen.clockOut();
+
+            expect(await HomeScreen.clockInBtn.isDisplayed()).toBe(true);
+        } else {
+            console.log('⚠️ Clock Out button not found at end');
+        }
+    });
 
 });

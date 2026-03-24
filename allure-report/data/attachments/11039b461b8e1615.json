@@ -1,0 +1,12 @@
+{
+  "script": "mobile: shell",
+  "args": [
+    {
+      "command": "pm grant",
+      "args": [
+        "com.gwl.trashscan",
+        "android.permission.CAMERA"
+      ]
+    }
+  ]
+}

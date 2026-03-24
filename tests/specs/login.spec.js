@@ -6,8 +6,14 @@ const users = require('../fixtures/users.json');
 describe('Login flow', () => {
     it('should login and reach Home screen', async () => {
         await DashboardScreen.skipToLogin();
+
+        // 👇 Handle permission before login
+        await LoginScreen.allowLocationPermissionIfPresent();
+
         await LoginScreen.login(users.valid.username, users.valid.password);
+
         await HomeScreen.waitForHomeScreen();
+
         console.log('✅ Login successful — Home screen loaded.');
     });
 });

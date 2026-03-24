@@ -8,7 +8,7 @@ cd /d C:\Users\gwl\Documents\GWL_App_Automation
 echo Starting Appium Server...
 start /min cmd /c "appium -p 4723"
 
-timeout /t 10
+timeout /t 30
 
 echo Running WDIO Tests...
 npx wdio run wdio.conf.js --spec ./tests/specs/login.spec.js

@@ -4,6 +4,22 @@ class LoginScreen {
     get loginBtn() { return $('id=com.gwl.trashscan:id/button_login'); }
 
     /**
+     * Handle location permission popup
+     */
+    async allowLocationPermissionIfPresent() {
+        try {
+            const allowBtn = await $('android=new UiSelector().resourceId("com.android.permissioncontroller:id/permission_allow_foreground_only_button")');
+
+            await allowBtn.waitForDisplayed({ timeout: 5000 });
+            await allowBtn.click();
+
+            console.log('📍 Location permission allowed');
+        } catch (err) {
+            console.log('ℹ️ Permission popup not shown');
+        }
+    }
+
+    /**
      * Performs login with provided credentials.
      */
     async login(user, pass) {
@@ -19,7 +35,9 @@ class LoginScreen {
         console.log('🚀 Clicking Login button...');
         await this.loginBtn.click();
 
-        // Wait for potential transition after login
+        // 👇 Handle permission right after login click
+        await this.allowLocationPermissionIfPresent();
+
         await driver.pause(3000);
     }
 }

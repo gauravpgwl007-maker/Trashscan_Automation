@@ -1,84 +1,116 @@
 pipeline {
-agent any
+    agent any
 
+    tools {
+        nodejs 'NodeJS'
+    }
 
-tools {
-    nodejs 'NodeJS'
-}
+    environment {
+        ANDROID_HOME = "C:\\Users\\gwl\\AppData\\Local\\Android\\Sdk"
+        PATH = "${ANDROID_HOME}\\platform-tools;${ANDROID_HOME}\\emulator;${env.PATH}"
+        AVD_NAME = "Pixel_7"
+    }
 
-triggers {
-    cron('0 4 * * *') // Daily run
-}
+    stages {
 
-environment {
-    ANDROID_HOME = "C:\\Users\\gwl\\AppData\\Local\\Android\\Sdk"
-    PATH = "${ANDROID_HOME}\\platform-tools;${ANDROID_HOME}\\emulator;${env.PATH}"
-    AVD_NAME = "Pixel_9_Pro_XL_API_36.1"
-}
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/gauravpgwl007-maker/Trashscan_Automation.git'
+            }
+        }
 
-stages {
+        stage('Install Dependencies') {
+            steps {
+                bat '''
+                echo Cleaning npm cache...
+                npm cache clean --force
 
-    stage('Checkout Code') {
-        steps {
-            git branch: 'main', url: 'https://github.com/gauravpgwl007-maker/Trashscan_Automation.git'
+                echo Removing node_modules...
+                rmdir /s /q node_modules
+
+                echo Deleting package-lock.json...
+                del package-lock.json
+
+                echo Installing dependencies...
+                npm install --legacy-peer-deps
+                '''
+            }
+        }
+
+        stage('Start Emulator') {
+            steps {
+                bat '''
+                echo Starting emulator...
+                start "" "%ANDROID_HOME%\\emulator\\emulator.exe" -avd %AVD_NAME% -no-snapshot -no-audio -no-boot-anim
+
+                echo Waiting a bit after emulator start...
+                ping 127.0.0.1 -n 10 > nul
+                '''
+            }
+        }
+
+        stage('Wait for Emulator Boot') {
+            steps {
+                bat '''
+                adb wait-for-device
+
+                :loop
+                adb shell getprop sys.boot_completed | find "1"
+                if errorlevel 1 (
+                    echo Waiting for emulator to boot...
+                    ping 127.0.0.1 -n 5 > nul
+                    goto loop
+                )
+
+                echo Emulator boot completed!
+                '''
+            }
+        }
+
+        stage('Start Appium') {
+            steps {
+                bat '''
+                echo Starting Appium server...
+                start "" cmd /c appium -p 4723
+
+                echo Waiting for Appium to be ready...
+                ping 127.0.0.1 -n 10 > nul
+                '''
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                bat '''
+                echo Running automation tests...
+                npx wdio run wdio.conf.js
+                '''
+            }
+        }
+
+        stage('Generate Allure Report') {
+            steps {
+                bat '''
+                echo Generating Allure report...
+                allure generate allure-results --clean -o allure-report
+                '''
+            }
         }
     }
 
-    stage('Install Dependencies') {
-        steps {
-            bat 'npm install --legacy-peer-deps'
+    post {
+        always {
+            allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
+        }
+
+        cleanup {
+            bat '''
+            echo Cleaning up emulator...
+
+            adb devices
+
+            adb -s emulator-5554 emu kill || exit 0
+            '''
         }
     }
-
-    stage('Start Emulator') {
-        steps {
-            bat """
-            start "" "%ANDROID_HOME%\\emulator\\emulator.exe" -avd %AVD_NAME% -no-snapshot -no-audio -no-boot-anim
-            """
-        }
-    }
-
-    stage('Wait for Emulator Boot') {
-        steps {
-            bat """
-            adb wait-for-device
-            adb shell getprop sys.boot_completed
-            timeout /t 30
-            """
-        }
-    }
-
-    stage('Start Appium') {
-        steps {
-            bat 'start cmd /k appium -p 4723'
-            bat 'timeout /t 10'
-        }
-    }
-
-    stage('Run Tests') {
-        steps {
-            bat 'npx wdio run wdio.conf.js'
-        }
-    }
-
-    stage('Generate Allure Report') {
-        steps {
-            bat 'allure generate allure-results --clean -o allure-report'
-        }
-    }
-}
-
-post {
-    always {
-        allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
-    }
-
-    cleanup {
-        bat """
-        adb -s emulator-5554 emu kill
-        """
-    }
-}
-
-
 }
