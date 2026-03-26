@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     triggers {
-    cron('30 20 * * *')   // ✅ Runs daily at 8:30 PM
-}
+        cron('30 20 * * *')   // ✅ Runs daily at 8:30 PM
+    }
 
     tools {
         nodejs 'NodeJS'
@@ -47,7 +47,6 @@ pipeline {
                 echo Starting emulator...
                 start "" "%ANDROID_HOME%\\emulator\\emulator.exe" -avd %AVD_NAME% -no-snapshot -no-audio -no-boot-anim
 
-                echo Waiting a bit after emulator start...
                 ping 127.0.0.1 -n 10 > nul
                 '''
             }
@@ -77,22 +76,23 @@ pipeline {
                 echo Starting Appium server...
                 start "" cmd /c appium -p 4723
 
-                echo Waiting for Appium to be ready...
                 ping 127.0.0.1 -n 10 > nul
                 '''
             }
         }
-        stage('Grant Permissions') {
-    steps {
-        bat '''
-        echo Granting app permissions...
 
-        adb shell pm grant com.gwl.trashscan android.permission.CAMERA
-        adb shell pm grant com.gwl.trashscan android.permission.READ_MEDIA_IMAGES
-        adb shell pm grant com.gwl.trashscan android.permission.READ_EXTERNAL_STORAGE
-        '''
-    }
-}
+        stage('Grant Permissions') {
+            steps {
+                bat '''
+                echo Granting app permissions...
+
+                adb shell pm grant com.gwl.trashscan android.permission.CAMERA
+                adb shell pm grant com.gwl.trashscan android.permission.READ_MEDIA_IMAGES
+                adb shell pm grant com.gwl.trashscan android.permission.READ_EXTERNAL_STORAGE
+                '''
+            }
+        }
+
         stage('Run Tests') {
             steps {
                 bat '''
@@ -101,19 +101,20 @@ pipeline {
                 '''
             }
         }
-        
+
         stage('Generate Allure Report') {
-    steps {
-        bat '''
-        if exist allure-results (
-            echo Generating Allure report...
-            allure generate allure-results --clean -o allure-report
-        ) else (
-            echo No allure-results found!
-        )
-        '''
-    }
-}
+            steps {
+                bat '''
+                if exist allure-results (
+                    echo Generating Allure report...
+                    allure generate allure-results --clean -o allure-report
+                ) else (
+                    echo No allure-results found!
+                )
+                '''
+            }
+        }
+    }   // ✅ IMPORTANT: closing stages block
 
     post {
         always {
@@ -121,18 +122,18 @@ pipeline {
         }
 
         cleanup {
-    bat '''
-    echo Cleaning up emulator...
+            bat '''
+            echo Cleaning up emulator...
 
-    adb devices
+            adb devices
 
-    for /f "tokens=1" %%i in ('adb devices ^| find "emulator"') do (
-        echo Killing %%i
-        adb -s %%i emu kill
-    )
+            for /f "tokens=1" %%i in ('adb devices ^| find "emulator"') do (
+                echo Killing %%i
+                adb -s %%i emu kill
+            )
 
-    exit 0
-    '''
-}
+            exit 0
+            '''
+        }
     }
 }
