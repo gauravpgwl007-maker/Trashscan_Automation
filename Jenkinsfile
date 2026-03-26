@@ -72,19 +72,16 @@ pipeline {
         }
 
         stage('Start Appium') {
-            steps {
-                bat '''
-                echo Killing any existing Appium...
-                taskkill /F /IM node.exe > nul 2>&1
+    steps {
+        bat '''
+        echo Starting Appium server...
+        start "" cmd /c appium -p 4723 --allow-insecure=adb_shell
 
-                echo Starting Appium server with adb_shell अनुमति...
-                start "" cmd /c appium -p 4723 --allow-insecure=adb_shell
-
-                echo Waiting for Appium to be ready...
-                ping 127.0.0.1 -n 15 > nul
-                '''
-            }
-        }
+        echo Waiting for Appium to be ready...
+        ping 127.0.0.1 -n 10 > nul
+        '''
+    }
+}
 
         stage('Grant Permissions') {
             steps {
