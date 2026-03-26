@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    triggers {
+        cron('30 11 * * *')   // ✅ Runs daily at 11:30 AM
+    }
+
     tools {
         nodejs 'NodeJS'
     }
@@ -78,7 +82,17 @@ pipeline {
                 '''
             }
         }
+        stage('Grant Permissions') {
+    steps {
+        bat '''
+        echo Granting app permissions...
 
+        adb shell pm grant com.gwl.trashscan android.permission.CAMERA
+        adb shell pm grant com.gwl.trashscan android.permission.READ_MEDIA_IMAGES
+        adb shell pm grant com.gwl.trashscan android.permission.READ_EXTERNAL_STORAGE
+        '''
+    }
+}
         stage('Run Tests') {
             steps {
                 bat '''
@@ -87,16 +101,19 @@ pipeline {
                 '''
             }
         }
-
+        
         stage('Generate Allure Report') {
-            steps {
-                bat '''
-                echo Generating Allure report...
-                allure generate allure-results --clean -o allure-report
-                '''
-            }
-        }
+    steps {
+        bat '''
+        if exist allure-results (
+            echo Generating Allure report...
+            allure generate allure-results --clean -o allure-report
+        ) else (
+            echo No allure-results found!
+        )
+        '''
     }
+}
 
     post {
         always {
