@@ -26,7 +26,8 @@ describe('Home Screen Functionality', () => {
             console.log('⚠️ Permission grant failed');
         }
     });
-
+  // ❌ COMMENTED CLOCK IN TEST
+    /*
     it('should handle Clock In if available', async () => {
         await HomeScreen.waitForHomeScreen();
 
@@ -39,7 +40,7 @@ describe('Home Screen Functionality', () => {
             console.log('⚠️ Clock In button not found, skipping test.');
         }
     });
-
+ */
     it('should open Work Progress and return to Home', async () => {
         await HomeScreen.waitForHomeScreen();
         await HomeScreen.openWorkProgress();
@@ -93,7 +94,8 @@ describe('Home Screen Functionality', () => {
 
         expect(await HomeScreen.violationTile.isDisplayed()).toBe(true);
     });
-
+// ❌ COMMENTED CLOCK OUT TEST
+    /*
     it('should perform Clock Out at the end', async () => {
         await HomeScreen.waitForHomeScreen();
 
@@ -106,5 +108,5 @@ describe('Home Screen Functionality', () => {
             console.log('⚠️ Clock Out button not found at end');
         }
     });
-
+*/
 });

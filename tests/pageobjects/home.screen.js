@@ -146,6 +146,9 @@ class HomeScreen {
     await driver.saveScreenshot(fileName);
     console.log(`📸 Screenshot: ${fileName}`);
 }
+    // ❌ COMMENTED CLOCK METHODS
+
+/*
     async clockIn() {
         await this.clockInBtn.waitForDisplayed({ timeout: 5000 });
         await driver.pause(1000);
@@ -158,6 +161,7 @@ class HomeScreen {
         await this.clockOutBtn.click();
         console.log('📉 Clock Out done');
     }
+        */
 
     async openWorkProgress() {
         await this.workProgressTile.waitForDisplayed({ timeout: 5000 });
