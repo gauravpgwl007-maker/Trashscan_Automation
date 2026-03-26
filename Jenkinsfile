@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     triggers {
-        cron('00 21 * * *')   // ✅ Runs daily at 8:30 PM
+        cron('30 21 * * *')   // ✅ Runs daily at 9:30 PM
     }
 
     tools {
@@ -47,6 +47,7 @@ pipeline {
                 echo Starting emulator...
                 start "" "%ANDROID_HOME%\\emulator\\emulator.exe" -avd %AVD_NAME% -no-snapshot -no-audio -no-boot-anim
 
+                echo Waiting after emulator start...
                 ping 127.0.0.1 -n 10 > nul
                 '''
             }
@@ -73,10 +74,14 @@ pipeline {
         stage('Start Appium') {
             steps {
                 bat '''
-                echo Starting Appium server...
-                start "" cmd /c appium -p 4723
+                echo Killing any existing Appium...
+                taskkill /F /IM node.exe > nul 2>&1
 
-                ping 127.0.0.1 -n 10 > nul
+                echo Starting Appium server with adb_shell अनुमति...
+                start "" cmd /c appium -p 4723 --allow-insecure=adb_shell
+
+                echo Waiting for Appium to be ready...
+                ping 127.0.0.1 -n 15 > nul
                 '''
             }
         }
@@ -114,7 +119,7 @@ pipeline {
                 '''
             }
         }
-    }   // ✅ IMPORTANT: closing stages block
+    }
 
     post {
         always {
@@ -132,7 +137,7 @@ pipeline {
                 adb -s %%i emu kill
             )
 
-            exit 0
+            echo Cleanup done
             '''
         }
     }
