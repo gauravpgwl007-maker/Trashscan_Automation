@@ -59,12 +59,12 @@ jobs:
             ~/.gradle
           key: android-${{ runner.os }}
 
-      # ✅ Install Appium
-    - name: Install Appium Drivers Safely
-  run: |
-    npm install -g appium
-    appium driver list --installed || true
-    appium driver install uiautomator2 || true
+      # ✅ Install Appium Drivers Safely (FIXED)
+      - name: Install Appium Drivers Safely
+        run: |
+          npm install -g appium
+          appium driver list --installed || true
+          appium driver install uiautomator2 || true
 
       # ✅ Setup Android SDK
       - name: Setup Android SDK
