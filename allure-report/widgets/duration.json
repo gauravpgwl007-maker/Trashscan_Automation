@@ -1,1 +1,1 @@
-[{"uid":"bfa4dafca5819ae0","name":"should login and reach Home screen","time":{"start":1774539096875,"stop":1774539104605,"duration":7730},"status":"broken","severity":"normal"}]
+[{"uid":"c48594b317e02b6","name":"should perform Clock In if button is available","time":{"start":1775922475899,"stop":1775922493656,"duration":17757},"status":"failed","severity":"normal"}]

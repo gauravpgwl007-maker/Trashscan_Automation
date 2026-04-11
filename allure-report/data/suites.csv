@@ -1,2 +1,2 @@
 "DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
-"","7730","should login and reach Home screen","","Thu Mar 26 21:01:36 IST 2026","broken","Thu Mar 26 21:01:44 IST 2026","","Login flow","",""
+"","17757","should perform Clock In if button is available","","Sat Apr 11 21:17:55 IST 2026","failed","Sat Apr 11 21:18:13 IST 2026","","Clock In","",""

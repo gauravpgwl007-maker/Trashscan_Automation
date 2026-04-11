@@ -23,6 +23,9 @@ exports.config = {
     './tests/specs/launch.spec.js',
     './tests/specs/login.spec.js',
     './tests/specs/home.spec.js',
+    './tests/specs/clockIn.spec.js',
+    './tests/specs/menu.spec.js',
+    './tests/specs/clockout.spec.js',
     './tests/specs/logout.spec.js'
   ],
   exclude: [],
@@ -36,7 +39,7 @@ exports.config = {
     {
       platformName: 'Android',
       'appium:deviceName': 'emulator-5554',
-      'appium:udid': 'emulator-5554',
+      'appium:udid': process.env.DEVICE_NAME || 'emulator-5554',
       'appium:platformVersion': '14',
       'appium:automationName': 'UiAutomator2',
       'appium:appPackage': 'com.gwl.trashscan',

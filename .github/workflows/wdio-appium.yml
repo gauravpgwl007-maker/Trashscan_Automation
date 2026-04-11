@@ -1,0 +1,103 @@
+name: WDIO Appium Fast Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        spec:
+          - launch.spec.js
+          - login.spec.js
+          - home.spec.js
+          - clockIn.spec.js
+          - menu.spec.js
+          - clockout.spec.js
+          - logout.spec.js
+
+    env:
+      CI: true
+
+    steps:
+      # ✅ Checkout
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # ✅ Cache Node Modules
+      - name: Cache Node Modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # ✅ Setup Node
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # ✅ Install Dependencies
+      - name: Install Dependencies
+        run: npm install
+
+      # ✅ Cache Android SDK
+      - name: Cache Android SDK
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.android
+            ~/.gradle
+          key: android-${{ runner.os }}
+
+      # ✅ Install Appium
+      - name: Install Appium
+        run: |
+          npm install -g appium
+          appium driver install uiautomator2
+
+      # ✅ Setup Android SDK
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      # ✅ Debug (optional but useful)
+      - name: Debug Files
+        run: ls -R
+
+      # 🚀 Run Emulator + Specific Spec
+      - name: Run Tests on Emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          profile: Nexus 6
+          arch: x86_64
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: |
+            adb devices
+            echo "Running spec: ${{ matrix.spec }}"
+            npx wdio run wdio.conf.js --spec ./tests/specs/${{ matrix.spec }}
+
+      # ✅ Upload Allure Results
+      - name: Upload Allure Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-${{ matrix.spec }}
+          path: allure-results
+
+      # ✅ Upload Screenshots
+      - name: Upload Screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-${{ matrix.spec }}
+          path: screenshots
