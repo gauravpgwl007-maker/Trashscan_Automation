@@ -85,6 +85,7 @@ jobs:
           script: |
             adb devices
             echo "Running spec: ${{ matrix.spec }}"
+            chmod +x ./node_modules/.bin/wdio
             npx wdio run wdio.conf.js --spec ./tests/specs/${{ matrix.spec }}
 
       # ✅ Upload Allure Results
