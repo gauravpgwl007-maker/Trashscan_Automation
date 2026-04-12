@@ -59,7 +59,7 @@ jobs:
             ~/.gradle
           key: android-${{ runner.os }}
 
-      # ✅ Install Appium Drivers Safely (FIXED)
+      # ✅ Install Appium Drivers Safely
       - name: Install Appium Drivers Safely
         run: |
           npm install -g appium
@@ -70,37 +70,50 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      # ✅ Debug (optional but useful)
-      - name: Debug Files
-        run: ls -R
-
-      # 🚀 Run Emulator + Specific Spec
+      # 🚀 Run Emulator + Tests (FIXED)
       - name: Run Tests on Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 30
           profile: Nexus 6
           arch: x86_64
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -accel on
           script: |
-            adb devices
+            echo "🔄 Restarting ADB..."
+            adb kill-server || true
+            adb start-server || true
 
-            echo "⏳ Waiting for emulator to be ready..."
-
+            echo "📱 Waiting for device..."
             adb wait-for-device
 
-            # Wait until boot is completed
-            until adb shell getprop sys.boot_completed | grep -m 1 '1'; do
-              echo "Waiting for boot..."
+            echo "🔁 Reconnecting emulator..."
+            adb reconnect || true
+
+            echo "⏳ Waiting for full boot..."
+
+            BOOTED=""
+            for i in {1..60}; do
+              BOOTED=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+              if [ "$BOOTED" = "1" ]; then
+                echo "✅ Emulator boot completed"
+                break
+              fi
+              echo "Waiting for boot... ($i)"
               sleep 5
             done
 
-            # Unlock screen
-            adb shell input keyevent 82
+            echo "🔓 Unlocking device..."
+            adb shell input keyevent 82 || true
 
-            echo "✅ Emulator ready!"
+            echo "⚡ Disabling animations..."
+            adb shell settings put global window_animation_scale 0
+            adb shell settings put global transition_animation_scale 0
+            adb shell settings put global animator_duration_scale 0
 
-            echo "Running spec: ${{ matrix.spec }}"
+            echo "📋 Devices:"
+            adb devices
+
+            echo "🚀 Running spec: ${{ matrix.spec }}"
 
             chmod +x ./node_modules/.bin/wdio
             ./node_modules/.bin/wdio run wdio.conf.js --spec ./tests/specs/${{ matrix.spec }}
