@@ -1,4 +1,4 @@
-name: WDIO Appium Fast Pipeline
+name: WDIO Appium Local Runner
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted   # ✅ IMPORTANT CHANGE
 
     strategy:
       fail-fast: false
@@ -29,17 +29,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # ✅ Cache Node Modules
-      - name: Cache Node Modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
       # ✅ Setup Node
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -50,69 +39,26 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      # ✅ Cache Android SDK
-      - name: Cache Android SDK
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.android
-            ~/.gradle
-          key: android-${{ runner.os }}
-
-      # ✅ Install Appium Drivers Safely
-      - name: Install Appium Drivers Safely
+      # ✅ Ensure Appium Running
+      - name: Start Appium Server
         run: |
           npm install -g appium
-          appium driver list --installed || true
           appium driver install uiautomator2 || true
+          nohup appium --port 4723 > appium.log 2>&1 &
+          sleep 10
 
-      # ✅ Setup Android SDK
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      # ✅ Check Emulator
+      - name: Check Emulator
+        run: |
+          adb devices
+          adb wait-for-device
 
-      # 🚀 Run Emulator + Tests (FINAL FIX)
-      - name: Run Tests on Emulator
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 30
-          profile: Nexus 6
-          arch: arm64-v8a   # ✅ FIXED (NO KVM ISSUE)
-          emulator-options: -no-window -noaudio -no-boot-anim -gpu swiftshader_indirect
-          script: |
-            echo "🔄 Restarting ADB..."
-            adb kill-server || true
-            adb start-server || true
-
-            echo "📱 Waiting for device..."
-            adb wait-for-device
-
-            echo "⏳ Waiting for full boot..."
-
-            for i in {1..60}; do
-              BOOTED=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
-              if [ "$BOOTED" = "1" ]; then
-                echo "✅ Emulator boot completed"
-                break
-              fi
-              echo "Waiting for boot... ($i)"
-              sleep 5
-            done
-
-            echo "🔓 Unlocking device..."
-            adb shell input keyevent 82 || true
-
-            echo "⚡ Disabling animations..."
-            adb shell settings put global window_animation_scale 0
-            adb shell settings put global transition_animation_scale 0
-            adb shell settings put global animator_duration_scale 0
-
-            echo "📋 Devices:"
-            adb devices
-
-            echo "🚀 Running spec: ${{ matrix.spec }}"
-
-            chmod +x ./node_modules/.bin/wdio
-            ./node_modules/.bin/wdio run wdio.conf.js --spec ./tests/specs/${{ matrix.spec }}
+      # 🚀 Run Tests
+      - name: Run WDIO Tests
+        run: |
+          echo "Running spec: ${{ matrix.spec }}"
+          chmod +x ./node_modules/.bin/wdio
+          ./node_modules/.bin/wdio run wdio.conf.js --spec ./tests/specs/${{ matrix.spec }}
 
       # ✅ Upload Allure Results
       - name: Upload Allure Results
