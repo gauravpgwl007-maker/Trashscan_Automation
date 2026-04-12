@@ -1,0 +1,12 @@
+﻿{
+  "repositoryName": "gauravpgwl007-maker/Trashscan_Automation",
+  "pipelineDirectory": "Trashscan_Automation",
+  "workspaceDirectory": "Trashscan_Automation\\Trashscan_Automation",
+  "repositories": {
+    "gauravpgwl007-maker/Trashscan_Automation": {
+      "repositoryPath": "Trashscan_Automation\\Trashscan_Automation",
+      "lastRunOn": "04/12/2026 10:20:30 +05:30"
+    }
+  },
+  "lastRunOn": "04/12/2026 10:22:37 +05:30"
+}

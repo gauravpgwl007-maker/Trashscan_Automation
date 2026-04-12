@@ -1,0 +1,45 @@
+Manual Violation
+Select property - new UiSelector().resourceId("com.gwl.trashscan:id/txt_property")
+select checkbox - new UiSelector().resourceId("com.gwl.trashscan:id/playerCB")
+Done - new UiSelector().resourceId("com.gwl.trashscan:id/doneBtn")
+Select building - new UiSelector().resourceId("com.gwl.trashscan:id/txt_building")
+select checkbox - new UiSelector().resourceId("com.gwl.trashscan:id/playerCB").instance(0)
+Done - new UiSelector().resourceId("com.gwl.trashscan:id/doneBtn")
+Select Bun tag - new UiSelector().resourceId("com.gwl.trashscan:id/txt_unit")
+select check box -new UiSelector().resourceId("com.gwl.trashscan:id/playerCB").instance(0)
+Done - new UiSelector().resourceId("com.gwl.trashscan:id/doneBtn")
+Select rule - new UiSelector().resourceId("com.gwl.trashscan:id/txt_reason")
+select checkbox - new UiSelector().resourceId("com.gwl.trashscan:id/checkbox").instance(4)
+Done - new UiSelector().resourceId("com.gwl.trashscan:id/doneBtn")
+Select vilation action - new UiSelector().resourceId("com.gwl.trashscan:id/txt_action")
+select checkbox - new UiSelector().resourceId("com.gwl.trashscan:id/playerCB").instance(11)
+Done - new UiSelector().resourceId("com.gwl.trashscan:id/doneBtn")
+Enter special note - new UiSelector().resourceId("com.gwl.trashscan:id/special_note_et")
+Test
+Add Image - new UiSelector().resourceId("com.gwl.trashscan:id/textview_title")
+Take photo - new UiSelector().resourceId("com.gwl.trashscan:id/txvCamera")
+Capture - new UiSelector().resourceId("com.gwl.trashscan:id/captureButton")
+Next - new UiSelector().resourceId("com.gwl.trashscan:id/nextTextView")
+Done - new UiSelector().resourceId("com.gwl.trashscan:id/text_done")
+
+
+
+
+
+Must Check in before this change - new UiSelector().resourceId("android:id/button1")
+Assigned property list - new UiSelector().resourceId("com.gwl.trashscan:id/assignedproperty_img")
+Daily task list select Complete task - new UiSelector().resourceId("com.gwl.trashscan:id/task_complete_button").instance(0)
+Upload Task - new UiSelector().resourceId("com.gwl.trashscan:id/txvAddImage")
+Allow permission - new UiSelector().resourceId("com.android.permissioncontroller:id/permission_allow_foreground_only_button")
+Allow permission 2 - new UiSelector().resourceId("com.android.permissioncontroller:id/permission_allow_all_button")
+Capture - new UiSelector().resourceId("com.android.camera2:id/shutter_button")
+Confirm - new UiSelector().resourceId("com.android.camera2:id/done_button")
+
+
+Open Task details complete task - new UiSelector().resourceId("com.gwl.trashscan:id/txvBtnTaskComplete")
+okay - new UiSelector().resourceId("android:id/button1")
+back - new UiSelector().resourceId("com.gwl.trashscan:id/ivBtnBack")
+back2 - new UiSelector().description("Navigate up")
+back3 - new UiSelector().description("Navigate up")
+
+

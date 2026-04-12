@@ -1,0 +1,77 @@
+name: WDIO Appium Local Runner
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: self-hosted   # ✅ IMPORTANT CHANGE
+
+    strategy:
+      fail-fast: false
+      matrix:
+        spec:
+          - launch.spec.js
+          - login.spec.js
+          - home.spec.js
+          - clockIn.spec.js
+          - menu.spec.js
+          - clockout.spec.js
+          - logout.spec.js
+
+    env:
+      CI: true
+
+    steps:
+      # ✅ Checkout
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # ✅ Setup Node
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # ✅ Install Dependencies
+      - name: Install Dependencies
+        run: npm install
+
+      # ✅ Ensure Appium Running
+      - name: Start Appium Server
+        run: |
+          npm install -g appium
+          appium driver install uiautomator2 || true
+          nohup appium --port 4723 > appium.log 2>&1 &
+          sleep 10
+
+      # ✅ Check Emulator
+      - name: Check Emulator
+        run: |
+          adb devices
+          adb wait-for-device
+
+      # 🚀 Run Tests
+      - name: Run WDIO Tests
+        run: |
+          echo "Running spec: ${{ matrix.spec }}"
+          chmod +x ./node_modules/.bin/wdio
+          ./node_modules/.bin/wdio run wdio.conf.js --spec ./tests/specs/${{ matrix.spec }}
+
+      # ✅ Upload Allure Results
+      - name: Upload Allure Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-${{ matrix.spec }}
+          path: allure-results
+
+      # ✅ Upload Screenshots
+      - name: Upload Screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-${{ matrix.spec }}
+          path: screenshots

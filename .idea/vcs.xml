@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="VcsDirectoryMappings">
-    <mapping directory="" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/actions-runner/Trashscan/Trashscan_Automation/Trashscan_Automation" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="https:/github.com/gauravpgwl007-maker/Trashscan_Automation" vcs="Git" />
   </component>
 </project>
