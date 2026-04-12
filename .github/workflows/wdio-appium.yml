@@ -70,14 +70,14 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      # 🚀 Run Emulator + Tests (FIXED)
+      # 🚀 Run Emulator + Tests (FINAL FIX)
       - name: Run Tests on Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 30
           profile: Nexus 6
-          arch: x86_64
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -accel on
+          arch: arm64-v8a   # ✅ FIXED (NO KVM ISSUE)
+          emulator-options: -no-window -noaudio -no-boot-anim -gpu swiftshader_indirect
           script: |
             echo "🔄 Restarting ADB..."
             adb kill-server || true
@@ -86,12 +86,8 @@ jobs:
             echo "📱 Waiting for device..."
             adb wait-for-device
 
-            echo "🔁 Reconnecting emulator..."
-            adb reconnect || true
-
             echo "⏳ Waiting for full boot..."
 
-            BOOTED=""
             for i in {1..60}; do
               BOOTED=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
               if [ "$BOOTED" = "1" ]; then
