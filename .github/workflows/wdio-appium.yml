@@ -74,4 +74,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: screenshots-${{ matrix.spec }}
-          path: screenshots
+          path: screenshotsupuuupup
