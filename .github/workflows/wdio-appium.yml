@@ -84,9 +84,26 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           script: |
             adb devices
+
+            echo "⏳ Waiting for emulator to be ready..."
+
+            adb wait-for-device
+
+            # Wait until boot is completed
+            until adb shell getprop sys.boot_completed | grep -m 1 '1'; do
+              echo "Waiting for boot..."
+              sleep 5
+            done
+
+            # Unlock screen
+            adb shell input keyevent 82
+
+            echo "✅ Emulator ready!"
+
             echo "Running spec: ${{ matrix.spec }}"
+
             chmod +x ./node_modules/.bin/wdio
-            npx wdio run wdio.conf.js --spec ./tests/specs/${{ matrix.spec }}
+            ./node_modules/.bin/wdio run wdio.conf.js --spec ./tests/specs/${{ matrix.spec }}
 
       # ✅ Upload Allure Results
       - name: Upload Allure Results
