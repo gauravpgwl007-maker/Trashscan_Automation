@@ -1,0 +1,11 @@
+﻿{
+  "agentId": 2,
+  "agentName": "DESKTOP-B9B5B45",
+  "poolId": 1,
+  "poolName": "Default",
+  "serverUrl": "https://pipelinesghubeus21.actions.githubusercontent.com/nQ9F8JQsJNC0ALDBqky79bdoMc3igapr3eK1NBUY3Z9YRatpSN/",
+  "gitHubUrl": "https://github.com/gauravpgwl007-maker/Trashscan_Automation",
+  "workFolder": "Trashscan",
+  "useV2Flow": true,
+  "serverUrlV2": "https://broker.actions.githubusercontent.com/"
+}
